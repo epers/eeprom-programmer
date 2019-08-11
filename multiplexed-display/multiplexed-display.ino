@@ -2,12 +2,19 @@
  * This sketch is specifically for programming the EEPROM used in the 8-bit
  * decimal display decoder described in https://youtu.be/dLh1n2dErzE
  */
-#define SHIFT_DATA 2
-#define SHIFT_CLK 3
-#define SHIFT_LATCH 4
-#define EEPROM_D0 5
-#define EEPROM_D7 12
-#define WRITE_EN 13
+#define SHIFT_DATA 16
+#define SHIFT_CLK 15  // 15
+#define SHIFT_LATCH 14  // 14
+#define EEPROM_D0 2
+#define EEPROM_D7 9
+#define WRITE_EN 10
+
+unsigned char reverse(unsigned char b) {
+   b = (b & 0xF0) >> 4 | (b & 0x0F) << 4;
+   b = (b & 0xCC) >> 2 | (b & 0x33) << 2;
+   b = (b & 0xAA) >> 1 | (b & 0x55) << 1;
+   return b;
+}
 
 /*
    Output the address bits and outputEnable signal using shift registers.
@@ -35,6 +42,7 @@ byte readEEPROM(int address) {
   for (int pin = EEPROM_D7; pin >= EEPROM_D0; pin -= 1) {
     data = (data << 1) + digitalRead(pin);
   }
+  data = reverse(data);
   return data;
 }
 
@@ -43,6 +51,7 @@ byte readEEPROM(int address) {
    Write a byte to the EEPROM at the specified address.
 */
 void writeEEPROM(int address, byte data) {
+  data = reverse(data);
   setAddress(address, /*outputEnable*/ false);
   for (int pin = EEPROM_D0; pin <= EEPROM_D7; pin += 1) {
     pinMode(pin, OUTPUT);
@@ -87,6 +96,7 @@ void setup() {
   digitalWrite(WRITE_EN, HIGH);
   pinMode(WRITE_EN, OUTPUT);
   Serial.begin(57600);
+  delay(5000);
 
 
   // Bit patterns for the digits 0..9
