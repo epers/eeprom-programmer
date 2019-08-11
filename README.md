@@ -1,5 +1,9 @@
 # Arduino EEPROM programmer
 
+## This fork
+I'm a derp and wired the data pins in reverse.
+
+
 Copyright 2017 Ben Eater
 
 This code and schematic are [MIT licensed](http://en.wikipedia.org/wiki/MIT_License).
